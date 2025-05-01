@@ -4,6 +4,8 @@ config({path: "./env/config.env"});
 
 const server=express();
 
+server.use(express.json());
+
 server.get("/", (req, res)=> {
   return res.send("Welcome to News Nest server");
 });
