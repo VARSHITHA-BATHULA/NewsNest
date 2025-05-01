@@ -8,6 +8,8 @@ server.get("/", (req, res)=> {
   return res.send("Welcome to News Nest server");
 });
 
-server.listen(process.env.PORT, ()=> {
-  console.log(`Server listening on port ${process.env.PORT}`);
+const PORT=process.env.PORT;
+
+server.listen(PORT, ()=> {
+  console.log(`Server listening on port ${PORT}`);
 });
