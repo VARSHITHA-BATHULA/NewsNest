@@ -1,20 +1,48 @@
 import express from "express";
 import { config } from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
 import userRoutes from "./routes/userRoutes.js";
-config({path: "./env/config.env"});
+import newsRoutes from "./routes/newsRoutes.js";
+import notesRoutes from "./routes/notesRoutes.js";
+import savedNewsRoutes from "./routes/savedNewsRoutes.js";
 
-const server=express();
+config({ path: "./env/config.env" });
 
+// Create Express app
+const server = express();
+
+// Middleware
 server.use(express.json());
+server.use(cookieParser());
+server.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
 
-server.get("/", (req, res)=> {
+// Welcome route
+server.get("/", (req, res) => {
   return res.send("Welcome to News Nest server");
 });
 
+// Routes
 server.use("/api/users", userRoutes);
+server.use("/api/news", newsRoutes);
+server.use("/api/notes", notesRoutes);
+server.use("/api/saved-news", savedNewsRoutes);
 
-const PORT=process.env.PORT;
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log("MongoDB Connection Error:", err));
 
-server.listen(PORT, ()=> {
+// Start server
+const PORT = process.env.PORT || 5000;
+
+server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
