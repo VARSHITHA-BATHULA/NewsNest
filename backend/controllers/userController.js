@@ -2,15 +2,61 @@ import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+// Valid sources and categories for validation
+const VALID_SOURCES = ["timesofindia", "hindu", "bbc", "guardian", "reuters"];
+const VALID_CATEGORIES = ["politics", "business", "technology", "sports"];
+
+// Helper function to validate preferences
+const validatePreferences = (preferences) => {
+  if (!preferences) return true;
+
+  // Validate sources - must be a single valid string
+  if (preferences.sources) {
+    if (
+      typeof preferences.sources !== "string" ||
+      !VALID_SOURCES.includes(preferences.sources)
+    ) {
+      return false;
+    }
+  }
+
+  // Validate categories
+  if (preferences.categories) {
+    if (!Array.isArray(preferences.categories)) {
+      return false;
+    }
+
+    if (
+      !preferences.categories.every((category) =>
+        VALID_CATEGORIES.includes(category)
+      )
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 // Register a new user
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, preferences } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
         message: "Please provide all required fields",
+      });
+    }
+
+    // Validate preferences if provided
+    if (preferences && !validatePreferences(preferences)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid preferences. Source must be one of: " +
+          VALID_SOURCES.join(", "),
       });
     }
 
@@ -27,15 +73,17 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Create user with default or provided preferences
     user = await User.create({
       name,
       email,
       password: hashedPassword,
-      preferences: {
-        sources: ["timesofindia", "hindu", "bbc", "guardian", "reuters"],
+      preferences: preferences || {
+        sources: "timesofindia",
         categories: ["politics", "business", "technology", "sports"],
       },
     });
+
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRE,
     });
@@ -114,6 +162,52 @@ export const login = async (req, res) => {
     res.status(200).json({
       success: true,
       token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        preferences: user.preferences,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update user preferences
+export const updatePreferences = async (req, res) => {
+  try {
+    const { preferences } = req.body;
+
+    if (!preferences) {
+      return res.status(400).json({
+        success: false,
+        message: "No preferences provided",
+      });
+    }
+
+    // Validate preferences
+    if (!validatePreferences(preferences)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid preferences. Source must be one of: " +
+          VALID_SOURCES.join(", "),
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { preferences },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Preferences updated successfully",
       user: {
         id: user._id,
         name: user.name,

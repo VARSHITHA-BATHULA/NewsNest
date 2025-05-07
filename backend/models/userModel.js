@@ -26,8 +26,12 @@ const userSchema = new mongoose.Schema({
   },
   preferences: {
     sources: {
-      type: [String],
-      default: ["timesofindia", "hindu", "bbc", "guardian", "reuters"],
+      type: String,
+      default: "timesofindia",
+      enum: {
+        values: ["timesofindia", "hindu", "bbc", "guardian", "reuters"],
+        message: "{VALUE} is not a valid news source!",
+      },
     },
     categories: {
       type: [String],
