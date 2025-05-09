@@ -4,10 +4,11 @@ import {
   login,
   logout,
   verifyUser,
-  resetPassword,
   forgotPassword,
+  updateProfile,
+  updatePreferences,
 } from "../controllers/userController.js";
-import { isAuthenticated } from "../middleware/auth.js";
+import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -16,7 +17,6 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", isAuthenticated, logout);
 router.get("/verify", isAuthenticated, verifyUser);
-router.post("/password/reset", resetPassword);
 router.post("/password/forgot", forgotPassword);
 
 // User profile routes
@@ -27,13 +27,7 @@ router.get("/profile", isAuthenticated, (req, res) => {
   });
 });
 
-router.put("/profile", isAuthenticated, (req, res) => {
-  // Logic to update user profile
-  res.status(200).json({
-    success: true,
-    message: "Profile updated successfully",
-  });
-});
+router.put("/profile", isAuthenticated, updateProfile);
 
 // User preferences routes
 router.get("/preferences", isAuthenticated, (req, res) => {
@@ -44,12 +38,6 @@ router.get("/preferences", isAuthenticated, (req, res) => {
   });
 });
 
-router.put("/preferences", isAuthenticated, (req, res) => {
-  // Logic to update user preferences
-  res.status(200).json({
-    success: true,
-    message: "Preferences updated successfully",
-  });
-});
+router.put("/preferences", isAuthenticated, updatePreferences);
 
 export default router;

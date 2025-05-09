@@ -4,7 +4,7 @@ import {
   getAllSavedNews,
   deleteSavedNews,
 } from "../controllers/savedNewsController.js";
-import { isAuthenticated } from "../middleware/auth.js";
+import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 
 // Valid sources and categories for validation
 const VALID_SOURCES = ["timesofindia", "hindu", "bbc", "guardian", "reuters"];
@@ -70,8 +70,8 @@ export const register = async (req, res) => {
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
 
     // Create user with default or provided preferences
     user = await User.create({
@@ -137,7 +137,7 @@ export const login = async (req, res) => {
     }
 
     // Check if password is correct
-    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    const isPasswordMatched = await bcryptjs.compare(password, user.password);
 
     if (!isPasswordMatched) {
       return res.status(401).json({
@@ -223,6 +223,57 @@ export const updatePreferences = async (req, res) => {
   }
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, email, preferences } = req.body;
+
+    // Basic validation
+    if (!name && !email && !preferences) {
+      return res.status(400).json({
+        success: false,
+        message: "No update fields provided",
+      });
+    }
+
+    // Validate preferences if included
+    if (preferences && !validatePreferences(preferences)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid preferences. Source must be one of: " +
+          VALID_SOURCES.join(", "),
+      });
+    }
+
+    const updatedFields = {};
+    if (name) updatedFields.name = name;
+    if (email) updatedFields.email = email;
+    if (preferences) updatedFields.preferences = preferences;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      updatedFields,
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        preferences: user.preferences,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 // Logout user
 export const logout = async (req, res) => {
   try {
@@ -265,57 +316,10 @@ export const verifyUser = async (req, res) => {
   }
 };
 
-// Reset password
-export const resetPassword = async (req, res) => {
-  try {
-    const { resetToken, password } = req.body;
-
-    if (!resetToken || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide reset token and new password",
-      });
-    }
-
-    // Find user with reset token
-    const user = await User.findOne({
-      resetPasswordToken: resetToken,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "Reset token is invalid or has expired",
-      });
-    }
-
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Update user password
-    user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Password reset successful",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
 // Forgot password
 export const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, newPassword } = req.body;
 
     if (!email) {
       return res.status(400).json({
@@ -334,24 +338,18 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
-    // Generate reset token
-    const resetToken = jwt.sign({ id: user._id }, process.env.RESET_SECRET, {
-      expiresIn: "15m",
-    });
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(newPassword, salt);
 
-    // Save reset token to user
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
     await user.save();
-
-    // Send reset token to user's email (mock implementation)
-    // In a real implementation, you would send an email with the reset link
 
     res.status(200).json({
       success: true,
-      message: "Password reset email sent",
-      // In development only:
-      resetToken,
+      message: "Password reset successful",
+      user
     });
   } catch (error) {
     res.status(500).json({
