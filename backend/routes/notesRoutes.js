@@ -6,7 +6,7 @@ import {
   updateNote,
   deleteNote,
 } from "../controllers/noteController.js";
-import { isAuthenticated } from "../middleware/auth.js";
+import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 
