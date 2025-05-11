@@ -7,9 +7,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
-const Sidebar = ({ activeSection, setActiveSection }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
+const Sidebar = ({ activeSection, setActiveSection, isCollapsed, setIsCollapsed }) => {
   const menuItems = [
     {
       id: "news",
@@ -34,7 +32,7 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
 
   return (
     <div
-      className={`h-screen sticky top-0 pt-16 bg-[var(--card-background)] border-r border-divider transition-all duration-300 z-10 ${
+      className={`h-screen sticky top-16 pt-4 bg-[var(--card-background)] border-r border-divider transition-all duration-300 z-10 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >

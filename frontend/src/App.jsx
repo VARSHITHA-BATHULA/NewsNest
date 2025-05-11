@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const [activeSection, setActiveSection] = useState("news");
@@ -31,19 +32,19 @@ function App() {
   ];
 
   return (
+    <>
     <div className="min-h-screen bg-[var(--background)] transition-colors duration-200">
-      <Navbar  zIndex="10"/>
-      <div className="flex">
+      <Navbar />
+      <div className="flex pt-16">
         <Sidebar
-          zIndex="1"
           activeSection={activeSection}
           setActiveSection={setActiveSection}
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
         />
         <main
-          className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${
-            isCollapsed ? "ml-16" : "ml-64"
+          className={`flex-1 max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 ${
+            isCollapsed ? "ml-16" : "ml-22"
           } transition-all duration-300`}
         >
           <h1 className="text-3xl font-bold mb-6 text-[var(--headlines)] transition-colors duration-200">
@@ -172,7 +173,9 @@ function App() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+      <ToastContainer/>
+    </>
   );
 }
 
