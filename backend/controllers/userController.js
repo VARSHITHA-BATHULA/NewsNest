@@ -161,6 +161,7 @@ export const login = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      message: "User logged in successfully",
       token,
       user: {
         id: user._id,
@@ -284,7 +285,7 @@ export const logout = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Logged out successfully",
+      message: "User logged out successfully",
     });
   } catch (error) {
     res.status(500).json({

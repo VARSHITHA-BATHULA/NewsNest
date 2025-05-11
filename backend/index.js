@@ -16,12 +16,7 @@ const server = express();
 // Middleware
 server.use(express.json());
 server.use(cookieParser());
-server.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    credentials: true,
-  })
-);
+server.use(cors());
 
 // Welcome route
 server.get("/", (req, res) => {
