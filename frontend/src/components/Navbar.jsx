@@ -1,5 +1,7 @@
+// Navbar.jsx
 import React, { useState, useRef, useEffect } from "react";
 import AuthModal from "./AuthModal";
+import UserProfile from "./UserProfile"; // Import the UserProfile component
 import { User } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -14,8 +16,7 @@ const Navbar = () => {
   useEffect(() => {
     const isDark =
       localStorage.getItem("darkMode") === "true" ||
-      (window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+      (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     setDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
@@ -136,7 +137,7 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {isDropdownOpen && (
+              {isDropdownOpen && uToken && (
                 <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[var(--card-background)] ring-1 ring-[var(--dividers)] py-1">
                   <a
                     href="#"
@@ -152,21 +153,34 @@ const Navbar = () => {
                   </a>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-[var(--accent)] hover:bg-[var(--highlight)]"
+                    className="w-full text-left px-4 py-2 text-[var(--accent)] hover:bg-[var(--highlight)]"
                   >
                     Logout
                   </button>
                 </div>
               )}
+
+              {/* User Profile Display */}
+              {isDropdownOpen && user && uToken && (
+                <UserProfile user={user} onClose={() => setIsDropdownOpen(false)} />
+              )}
+
             </div>
 
             {/* Create Account Button */}
-            {!uToken && (
+            {!uToken ? (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="text-[var(--secondary)] hover:text-[var(--text-primary)] focus:outline-none transition-colors duration-200 font-semibold cursor-pointer"
+                className="w-full text-left px-2 py-2 text-[var(--secondary)] hover:text-[var(--text-primary)] focus:outline-none transition-colors duration-200 font-semibold cursor-pointer"
               >
                 Create Account
+              </button>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-2 py-2 text-[var(--accent)] focus:outline-none transition-colors duration-200 font-semibold cursor-pointer"
+              >
+                Logout
               </button>
             )}
           </div>
