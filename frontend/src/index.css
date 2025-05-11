@@ -2,5 +2,201 @@
 @import "tailwindcss";
 
 * {
-  font-family: Outfit;
+  font-family: 'Outfit', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom light mode variables - more gentle and light */
+:root {
+  --background: #FFFFFF;
+  --card-background: #F8FAFC;
+  --text-primary: #2D3748;
+  --headlines: #2563EB;
+  --accent: #E05D14;
+  --secondary: #64748B;
+  --dividers: #E2E8F0;
+  --highlight: #EFF6FF;
+  --input-bg: #F9FAFB;
+  --nav-bg: #F0F7FF;
+}
+
+/* Custom dark mode variables - improved contrast and readability */
+.dark {
+  --background: #111827;
+  --card-background: #1E293B;
+  --text-primary: #F1F5F9;
+  --headlines: #60A5FA;
+  --accent: #F97316;
+  --secondary: #CBD5E1;
+  --dividers: #334155;
+  --highlight: #1E3A8A;
+  --input-bg: #1F2937;
+  --nav-bg: #1E293B;
+}
+
+/* Base styles */
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--headlines);
+  font-weight: 600;
+}
+
+a {
+  color: var(--headlines);
+  transition: opacity 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.85;
+}
+
+button {
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Card and container styling */
+.card, .container, .panel, .section {
+  background-color: var(--card-background);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dark .card, .dark .container, .dark .panel, .dark .section {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Form elements */
+input, textarea, select {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--dividers);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--headlines);
+  outline-offset: 1px;
+}
+
+/* Navigation styling */
+nav, header {
+  background-color: var(--nav-bg);
+}
+
+/* Button styling */
+.btn, button[type="submit"], .save-button {
+  background-color: var(--accent);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: white;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--headlines);
+  color: var(--headlines);
+}
+
+/* News headlines and content */
+.headline {
+  font-weight: 600;
+  color: var(--headlines);
+}
+
+.source {
+  color: var(--secondary);
+  font-size: 0.875rem;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--dividers);
+  margin: 1rem 0;
+}
+
+/* Dark mode specific overrides */
+.dark .bg-white {
+  background-color: var(--card-background);
+}
+
+.dark .border {
+  border-color: var(--dividers);
+}
+
+/* Custom utility classes */
+.text-headlines {
+  color: var(--headlines);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.border-divider {
+  border-color: var(--dividers);
+}
+
+.bg-highlight {
+  background-color: var(--highlight);
+}
+
+/* Theme toggle styling */
+.theme-toggle {
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  background-color: var(--card-background);
+}
+
+.theme-toggle:hover {
+  background-color: var(--highlight);
+}
+
+/* Additional elements for NewsNest */
+.news-card {
+  border-left: 3px solid var(--headlines);
+  padding-left: 0.75rem;
+}
+
+.personal-notes textarea {
+  background-color: var(--input-bg);
+  border: 1px solid var(--dividers);
+  width: 100%;
+  min-height: 100px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :root, .dark {
+    --card-padding: 1rem;
+  }
+  
+  .container {
+    padding-left: var(--card-padding);
+    padding-right: var(--card-padding);
+  }
 }
