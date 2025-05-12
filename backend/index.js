@@ -16,7 +16,11 @@ const server = express();
 // Middleware
 server.use(express.json());
 server.use(cookieParser());
-server.use(cors());
+server.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+
 
 // Welcome route
 server.get("/", (req, res) => {
