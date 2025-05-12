@@ -226,30 +226,11 @@ export const updatePreferences = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email, preferences } = req.body;
-
-    // Basic validation
-    if (!name && !email && !preferences) {
-      return res.status(400).json({
-        success: false,
-        message: "No update fields provided",
-      });
-    }
-
-    // Validate preferences if included
-    if (preferences && !validatePreferences(preferences)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid preferences. Source must be one of: " +
-          VALID_SOURCES.join(", "),
-      });
-    }
+    const { name, email } = req.body;
 
     const updatedFields = {};
     if (name) updatedFields.name = name;
     if (email) updatedFields.email = email;
-    if (preferences) updatedFields.preferences = preferences;
 
     const user = await User.findByIdAndUpdate(
       req.user.id,

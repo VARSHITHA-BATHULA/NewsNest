@@ -1,4 +1,5 @@
-import { useState } from "react";
+// Sidebar.jsx
+import { Link } from "react-router-dom";
 import {
   Newspaper,
   BookmarkCheck,
@@ -13,16 +14,19 @@ const Sidebar = ({ activeSection, setActiveSection, isCollapsed, setIsCollapsed 
       id: "news",
       label: "News",
       icon: <Newspaper size={20} />,
+      path: "/news",
     },
     {
       id: "saved-notes",
       label: "Saved Notes",
       icon: <NotepadText size={20} />,
+      path: "/savednotes",
     },
     {
       id: "bookmarks",
       label: "Bookmarks",
       icon: <BookmarkCheck size={20} />,
+      path: "/bookmarks",
     },
   ];
 
@@ -41,21 +45,21 @@ const Sidebar = ({ activeSection, setActiveSection, isCollapsed, setIsCollapsed 
           <ul className="space-y-2 px-3">
             {menuItems.map((item) => (
               <li key={item.id}>
-                <button
-                  onClick={() => setActiveSection(item.id)}
-                  className={`flex items-center w-full p-3 rounded-md transition-colors duration-200 hover:bg-highlight ${
-                    activeSection === item.id
-                      ? "bg-highlight text-accent"
-                      : "text-[var(--text-primary)]"
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <span className="mr-3">{item.icon}</span>
-                    {!isCollapsed && (
-                      <span className="font-medium">{item.label}</span>
-                    )}
-                  </div>
-                </button>
+                <Link to={item.path}>
+                  <button
+                    onClick={() => setActiveSection(item.id)}
+                    className={`flex items-center w-full p-3 rounded-md transition-colors duration-200 hover:bg-highlight ${
+                      activeSection === item.id
+                        ? "bg-highlight text-accent"
+                        : "text-[var(--text-primary)]"
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <span className="mr-3">{item.icon}</span>
+                      {!isCollapsed && <span className="font-medium">{item.label}</span>}
+                    </div>
+                  </button>
+                </Link>
               </li>
             ))}
           </ul>
