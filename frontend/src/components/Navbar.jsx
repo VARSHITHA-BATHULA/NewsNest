@@ -1,7 +1,6 @@
-// Navbar.jsx
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import AuthModal from "./AuthModal";
-import UserProfile from "./UserProfile"; // Import the UserProfile component
+import UserProfile from "./UserProfile";
 import { User } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -10,7 +9,7 @@ const Navbar = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [uToken, setUToken] = useState(false);
+  const [uToken, setUToken] = useState(localStorage.getItem("UserToken") ? localStorage.getItem("UserToken") : false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -56,8 +55,8 @@ const Navbar = () => {
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem("UserData", JSON.stringify(userData));
-    localStorage.setItem("UserToken", "your-token");
-    setUToken("your-token");
+    const token = localStorage.getItem("UserToken");
+    setUToken(token);
     setIsModalOpen(false);
   };
 
@@ -78,7 +77,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-[var(--nav-bg)] z-20 shadow-md fixed top-0 left-0 right-0 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
@@ -137,32 +136,16 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {isDropdownOpen && uToken && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[var(--card-background)] ring-1 ring-[var(--dividers)] py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--highlight)]"
-                  >
-                    Your Profile
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--highlight)]"
-                  >
-                    Settings
-                  </a>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-[var(--accent)] hover:bg-[var(--highlight)]"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-
               {/* User Profile Display */}
               {isDropdownOpen && user && uToken && (
-                <UserProfile user={user} onClose={() => setIsDropdownOpen(false)} />
+                <UserProfile
+                user={user}
+                onClose={() => setIsDropdownOpen(false)}
+                onUpdate={(updatedUser) => {
+                  setUser(updatedUser);
+                  localStorage.setItem("UserData", JSON.stringify(updatedUser));
+                }}
+              />              
               )}
 
             </div>
