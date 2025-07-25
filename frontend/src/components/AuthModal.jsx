@@ -1,8 +1,8 @@
 // AuthModal.jsx
-
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Route } from "react-router-dom";
 
 const AuthModal = ({ onClose, onLoginSuccess }) => {
   const [isSignup, setIsSignup] = useState(true);
@@ -38,34 +38,52 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
     e.preventDefault();
     try {
       if (isSignup) {
-        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/register`, formData);
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/register`,
+          formData
+        );
         toast.success(response.data.message);
+        <Route path="/home" element={<App />} />;
+        // Store token, userId, and name in localStorage
         localStorage.setItem("UserToken", response.data.token);
+        localStorage.setItem("UserId", response.data.user._id); // Assuming user object has _id
+        localStorage.setItem("UserName", response.data.user.name);
         onLoginSuccess(response.data.user);
         onClose();
       } else {
-        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/login`, {
-          email: formData.email,
-          password: formData.password,
-        });
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/login`,
+          {
+            email: formData.email,
+            password: formData.password,
+          }
+        );
         toast.success(response.data.message);
+        // Store token, userId, and name in localStorage
         localStorage.setItem("UserToken", response.data.token);
+        localStorage.setItem("UserId", response.data.user._id); // Assuming user object has _id
+        localStorage.setItem("UserName", response.data.user.name);
         onLoginSuccess(response.data.user);
         onClose();
       }
     } catch (error) {
-      alert(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred");
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-lg w-[460px] sm:w-[500px]">
-        <h2 className="text-3xl mb-5 text-center">{isSignup ? "Sign Up" : "Log In"}</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-[var(--card-background)] p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-[400px] sm:max-w-[460px] mx-4">
+        <h2 className="text-2xl sm:text-3xl mb-5 text-center font-semibold text-[var(--headlines)]">
+          {isSignup ? "Sign Up" : "Log In"}
+        </h2>
         <form onSubmit={handleSubmit}>
           {isSignup && (
             <div className="mb-4">
-              <label className="block mb-1" htmlFor="name">
+              <label
+                className="block mb-1 text-sm text-[var(--text-primary)]"
+                htmlFor="name"
+              >
                 Name
               </label>
               <input
@@ -75,12 +93,15 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="border rounded w-full p-2"
+                className="w-full p-2 border border-[var(--dividers)] rounded-md bg-[var(--input-bg)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--headlines)] text-sm"
               />
             </div>
           )}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="email">
+            <label
+              className="block mb-1 text-sm text-[var(--text-primary)]"
+              htmlFor="email"
+            >
               Email
             </label>
             <input
@@ -90,11 +111,14 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="border rounded w-full p-2"
+              className="w-full p-2 border border-[var(--dividers)] rounded-md bg-[var(--input-bg)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--headlines)] text-sm"
             />
           </div>
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="password">
+            <label
+              className="block mb-1 text-sm text-[var(--text-primary)]"
+              htmlFor="password"
+            >
               Password
             </label>
             <input
@@ -104,12 +128,15 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="border rounded w-full p-2"
+              className="w-full p-2 border border-[var(--dividers)] rounded-md bg-[var(--input-bg)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--headlines)] text-sm"
             />
           </div>
           {isSignup && (
             <div className="mb-4">
-              <label className="block mb-1" htmlFor="preferences">
+              <label
+                className="block mb-1 text-sm text-[var(--text-primary)]"
+                htmlFor="preferences"
+              >
                 Preferred News Source
               </label>
               <select
@@ -117,33 +144,36 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
                 name="preferences"
                 value={formData.preferences.sources}
                 onChange={handleChange}
-                className="border rounded w-full p-2"
+                className="w-full p-2 border border-[var(--dividers)] rounded-md bg-[var(--input-bg)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--headlines)] text-sm"
               >
                 <option value="timesofindia">Times of India</option>
-                <option value="hindu">Hindu</option>
+                <option value="hindu">The Hindu</option>
                 <option value="bbc">BBC</option>
-                <option value="guardian">Guardian</option>
+                <option value="guardian">The Guardian</option>
                 <option value="reuters">Reuters</option>
               </select>
             </div>
           )}
           <button
             type="submit"
-            className="bg-blue-500 text-white rounded px-4 py-2 block mx-auto mt-2"
+            className="bg-[var(--accent)] text-white rounded-md px-4 py-2 block mx-auto mt-4 hover:opacity-90 transition-all duration-200 text-sm font-medium"
           >
             {isSignup ? "Sign Up" : "Log In"}
           </button>
         </form>
-        <p className="mt-4 text-center">
+        <p className="mt-4 text-center text-sm text-[var(--text-primary)]">
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
             onClick={() => setIsSignup(!isSignup)}
-            className="text-blue-500"
+            className="text-[var(--accent)] hover:underline"
           >
             {isSignup ? "Log In" : "Sign Up"}
           </button>
         </p>
-        <button onClick={onClose} className="mt-4 text-red-500 block mx-auto">
+        <button
+          onClick={onClose}
+          className="mt-4 text-red-500 block mx-auto text-sm hover:underline"
+        >
           Close
         </button>
       </div>

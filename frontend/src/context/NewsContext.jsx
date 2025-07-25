@@ -110,3 +110,5 @@ export const useNews = () => {
   }
   return context;
 };
+
+export default NewsContext;

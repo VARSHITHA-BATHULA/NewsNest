@@ -8,8 +8,19 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
-const Sidebar = ({ activeSection, setActiveSection, isCollapsed, setIsCollapsed }) => {
+const Sidebar = ({
+  activeSection,
+  setActiveSection,
+  isCollapsed,
+  setIsCollapsed,
+}) => {
   const menuItems = [
+    {
+      id: "home",
+      label: "Home",
+      icon: <Newspaper size={20} />,
+      path: "/",
+    },
     {
       id: "news",
       label: "News",
@@ -36,50 +47,56 @@ const Sidebar = ({ activeSection, setActiveSection, isCollapsed, setIsCollapsed 
 
   return (
     <div
-      className={`h-screen sticky top-16 pt-4 bg-[var(--card-background)] border-r border-divider transition-all duration-300 z-10 ${
-        isCollapsed ? "w-16" : "w-64"
+      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-[var(--card-background)] border-r border-[var(--dividers)] transition-all duration-300 flex flex-col z-10 ${
+        isCollapsed ? "w-16" : "w-16 sm:w-64"
       }`}
     >
-      <div className="h-full flex flex-col justify-between">
-        <div className="mt-6">
-          <ul className="space-y-2 px-3">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                <Link to={item.path}>
-                  <button
-                    onClick={() => setActiveSection(item.id)}
-                    className={`flex items-center w-full p-3 rounded-md transition-colors duration-200 hover:bg-highlight ${
-                      activeSection === item.id
-                        ? "bg-highlight text-accent"
-                        : "text-[var(--text-primary)]"
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <span className="mr-3">{item.icon}</span>
-                      {!isCollapsed && <span className="font-medium">{item.label}</span>}
-                    </div>
-                  </button>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Main menu items */}
+      <div className="flex-1 pt-6">
+        <ul className="space-y-2 px-2 sm:px-3">
+          {menuItems.map((item) => (
+            <li key={item.id}>
+              <Link to={item.path}>
+                <button
+                  onClick={() => setActiveSection(item.id)}
+                  className={`flex items-center w-full p-2 sm:p-3 rounded-md transition-colors duration-200 hover:bg-[var(--highlight)] ${
+                    activeSection === item.id
+                      ? "bg-[var(--highlight)] text-[var(--accent)]"
+                      : "text-[var(--text-primary)]"
+                  }`}
+                >
+                  <div className="flex items-center justify-center sm:justify-start w-full">
+                    <span className={`${isCollapsed ? "mx-auto" : "mr-3"}`}>
+                      {item.icon}
+                    </span>
+                    {!isCollapsed && (
+                      <span className="font-medium hidden sm:inline">
+                        {item.label}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-        <div className="mb-8 px-3">
-          <button
-            onClick={toggleSidebar}
-            className="flex items-center justify-center w-full p-2 rounded-md bg-highlight text-headlines hover:opacity-90 transition-colors duration-200"
-          >
-            {isCollapsed ? (
-              <ChevronRight size={20} />
-            ) : (
-              <>
-                <span className="mr-2">Collapse</span>
-                <ChevronLeft size={16} />
-              </>
-            )}
-          </button>
-        </div>
+      {/* Collapse button at bottom */}
+      <div className="mb-4 px-2 sm:px-3">
+        <button
+          onClick={toggleSidebar}
+          className="flex items-center justify-center w-full p-2 sm:p-3 rounded-md bg-[var(--highlight)] text-[var(--headlines)] hover:opacity-90 transition-colors duration-200"
+        >
+          {isCollapsed ? (
+            <ChevronRight size={20} />
+          ) : (
+            <>
+              <span className="mr-2 hidden sm:inline">Collapse</span>
+              <ChevronLeft size={16} />
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
