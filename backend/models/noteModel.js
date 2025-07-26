@@ -36,6 +36,10 @@ noteSchema.pre("save", function (next) {
   next();
 });
 
+noteSchema.pre(['findOneAndUpdate', 'findByIdAndUpdate'], function (next) {
+  this.set({ updatedAt: Date.now() });
+  next();
+});
 const Note = mongoose.model("Note", noteSchema);
 
 export default Note;

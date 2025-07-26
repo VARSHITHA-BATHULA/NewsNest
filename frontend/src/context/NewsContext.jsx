@@ -14,6 +14,7 @@ export const NewsProvider = ({ children }) => {
   const [bookmarks, setBookmarks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   // Fetch headlines from NewsAPI
   const fetchHeadlines = async () => {

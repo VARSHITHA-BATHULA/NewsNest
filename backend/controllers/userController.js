@@ -100,7 +100,7 @@ export const register = async (req, res) => {
       message: "User registered successfully",
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         preferences: user.preferences,
@@ -164,7 +164,7 @@ export const login = async (req, res) => {
       message: "User logged in successfully",
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         preferences: user.preferences,

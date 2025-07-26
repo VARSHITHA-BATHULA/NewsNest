@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const AuthModal = ({ onClose, onLoginSuccess }) => {
   const [isSignup, setIsSignup] = useState(true);
@@ -15,6 +15,7 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
       categories: ["politics", "business", "technology", "sports"],
     },
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +37,7 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
     try {
       if (isSignup) {
         const response = await axios.post(
@@ -43,13 +45,14 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
           formData
         );
         toast.success(response.data.message);
-        <Route path="/home" element={<App />} />;
+        // <Route path="/home" element={<App />} />;
         // Store token, userId, and name in localStorage
         localStorage.setItem("UserToken", response.data.token);
-        localStorage.setItem("UserId", response.data.user._id); // Assuming user object has _id
+        localStorage.setItem("UserId", response.data.user._id);
         localStorage.setItem("UserName", response.data.user.name);
         onLoginSuccess(response.data.user);
         onClose();
+        navigate('/');
       } else {
         const response = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/api/users/login`,
@@ -65,6 +68,7 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
         localStorage.setItem("UserName", response.data.user.name);
         onLoginSuccess(response.data.user);
         onClose();
+        navigate('/');
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");

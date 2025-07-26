@@ -10,69 +10,171 @@ const SavedNotes = () => {
   const [noteContent, setNoteContent] = useState("");
   const [noteTags, setNoteTags] = useState("");
   const [editingNoteId, setEditingNoteId] = useState(null);
+  
+  useEffect(() => {
+    const token = localStorage.getItem("UserToken");
+    console.log("Token on component mount:", token);
+    console.log("Token exists:", !!token);
+    if (token) {
+      console.log("Token preview:", `${token.substring(0, 20)}...`);
+    }
+  }, []);
 
+  // const fetchNotes = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:5000/api/notes", {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("UserToken")}`,
+  //       },
+  //     });
+  //     setNotes(response.data.notes);
+  //   } catch (error) {
+  //     toast.error("Failed to fetch notes");
+  //   }
+  // };
   const fetchNotes = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/notes", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("UserToken")}`,
-        },
-      });
-      setNotes(response.data.notes);
-    } catch (error) {
+  const token = localStorage.getItem("UserToken");
+  console.log("Fetching notes with token:", !!token);
+  
+  try {
+    const response = await axios.get("http://localhost:5000/api/notes", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    console.log("Fetch notes response:", response.data);
+    setNotes(response.data.notes);
+  } catch (error) {
+    console.error("Fetch notes error:", error);
+    console.error("Error response:", error.response);
+    
+    if (error.response?.status === 401) {
+      toast.error("Please log in again");
+      // Optionally redirect to login
+    } else {
       toast.error("Failed to fetch notes");
     }
-  };
+  }
+};
 
   const saveNote = async () => {
     if (!noteTitle || !noteContent) {
       toast.error("Title and content are required");
       return;
     }
+    // Debug: Check token exists
+  const token = localStorage.getItem("UserToken");
+  console.log("Token exists:", !!token);
+  console.log("Token preview:", token ? `${token.substring(0, 20)}...` : "No token");
 
-    try {
-      if (editingNoteId) {
-        await axios.put(
-          `http://localhost:5000/api/notes/${editingNoteId}`,
-          {
-            title: noteTitle,
-            content: noteContent,
-            tags: noteTags.split(",").map((tag) => tag.trim()),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("UserToken")}`,
-            },
-          }
-        );
-
-        toast.success("Note updated successfully");
-      } else {
-        await axios.post(
-          "http://localhost:5000/api/notes",
-          {
-            title: noteTitle,
-            content: noteContent,
-            tags: noteTags.split(",").map((tag) => tag.trim()),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("UserToken")}`,
-            },
-          }
-        );
-
-        toast.success("Note saved successfully");
-      }
-
-      resetForm();
-      fetchNotes();
-    } catch (error) {
-      toast.error("Failed to save note");
-    }
+  // Debug: Check data being sent
+  const noteData = {
+    title: noteTitle,
+    content: noteContent,
+    tags: noteTags.split(",").map((tag) => tag.trim()).filter(tag => tag.length > 0),
   };
+  console.log("Sending note data:", noteData);
+  try {
+    let response;
+    
+    if (editingNoteId) {
+      console.log("Updating note with ID:", editingNoteId);
+      response = await axios.put(
+        `http://localhost:5000/api/notes/${editingNoteId}`,
+        noteData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Note updated successfully");
+    } else {
+      console.log("Creating new note");
+      response = await axios.post(
+        "http://localhost:5000/api/notes",
+        noteData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Note saved successfully");
+    }
+
+    console.log("Success response:", response.data);
+    resetForm();
+    fetchNotes();
+  } catch (error) {
+    console.error("Full error object:", error);
+    console.error("Error response:", error.response);
+    console.error("Error message:", error.message);
+    
+    if (error.response) {
+      // Server responded with error status
+      console.error("Status:", error.response.status);
+      console.error("Data:", error.response.data);
+      
+      const errorMessage = error.response.data?.message || "Failed to save note";
+      toast.error(`Error: ${errorMessage}`);
+    } else if (error.request) {
+      // Network error
+      console.error("Network error - no response received");
+      toast.error("Network error. Please check your connection.");
+    } else {
+      // Something else happened
+      toast.error("An unexpected error occurred");
+    }
+  }
+};
+
+  //   try {
+  //     if (editingNoteId) {
+  //       await axios.put(
+  //         `http://localhost:5000/api/notes/${editingNoteId}`,
+  //         {
+  //           title: noteTitle,
+  //           content: noteContent,
+  //           tags: noteTags.split(",").map((tag) => tag.trim()),
+  //         },
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${localStorage.getItem("UserToken")}`,
+  //           },
+  //         }
+  //       );
+
+  //       toast.success("Note updated successfully");
+  //     } else {
+  //       await axios.post(
+  //         "http://localhost:5000/api/notes",
+  //         {
+  //           title: noteTitle,
+  //           content: noteContent,
+  //           tags: noteTags.split(",").map((tag) => tag.trim()),
+  //         },
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${localStorage.getItem("UserToken")}`,
+  //           },
+  //         }
+  //       );
+
+  //       toast.success("Note saved successfully");
+  //     }
+
+  //     resetForm();
+  //     fetchNotes();
+  //   } catch (error) {
+  //     toast.error("Failed to save note");
+  //   }
+  // };
 
   const resetForm = () => {
     setNoteTitle("");

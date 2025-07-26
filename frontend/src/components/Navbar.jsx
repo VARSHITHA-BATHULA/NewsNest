@@ -26,16 +26,19 @@ const Navbar = () => {
     document.documentElement.classList.toggle("dark", isDark);
 
     const token = localStorage.getItem("UserToken");
-    const storedUser = localStorage.getItem("UserData");
+    const userId = localStorage.getItem("UserId");
+    const userName = localStorage.getItem("UserName");
 
-    if (token && storedUser) {
+    if (token && userId && userName) {
       setUToken(token);
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error("Invalid user data in localStorage");
-      }
+      const userData = {
+        _id: userId,
+        name: userName,
+      };
+      setUser(userData);
+    } else {
+      setUToken(false);
+      setUser(null);
     }
   }, []);
 
@@ -59,6 +62,7 @@ const Navbar = () => {
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
+    // Store user data for consistency (optional)
     localStorage.setItem("UserData", JSON.stringify(userData));
     const token = localStorage.getItem("UserToken");
     setUToken(token);
@@ -67,12 +71,13 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("UserToken");
+    localStorage.removeItem("UserId");
+    localStorage.removeItem("UserName");
     localStorage.removeItem("UserData");
     setUser(null);
     setUToken(false);
     setIsDropdownOpen(false);
     toast.success("User logged out successfully");
-    // window.location.reload();
   };
 
   const getInitials = (userName) => {
